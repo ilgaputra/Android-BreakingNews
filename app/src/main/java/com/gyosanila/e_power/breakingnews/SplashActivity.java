@@ -29,13 +29,7 @@ public class SplashActivity extends AppCompatActivity {
 
                 Intent i = new Intent(SplashActivity.this, HomeActivity.class);
                 startActivity(i);
-
-                this.finish();
-            }
-
-            private void finish() {
-                // TODO Auto-generated method stub
-
+                finish();
             }
         }, splashInterval);
     }
