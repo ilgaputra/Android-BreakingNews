@@ -4,17 +4,16 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gyosanila.e_power.breakingnews.R;
@@ -104,12 +103,11 @@ public class DetailActivity extends AppCompatActivity {
 
     public void FloatingAction()
     {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
     }
@@ -117,10 +115,12 @@ public class DetailActivity extends AppCompatActivity {
     public void clickHandler(View v){
         if (v.getId() == R.id.tvLink) {
             Log.e("Home",Url);
-            //startActivity(new Intent(getApplicationContext(), Red.class));
+            Intent browserIntent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(Url));
+            startActivity(browserIntent);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
