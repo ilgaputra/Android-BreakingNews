@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.gyosanila.e_power.breakingnews.Home.HomeActivity;
+import com.gyosanila.e_power.breakingnews.Home.View.HomeActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -20,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
+
         new Handler().postDelayed(new Runnable() {
 
 
