@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.gyosanila.e_power.breakingnews.DetailNews.DetailActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_love"
+        android:icon="@drawable/ic_heart_dark"
+        android:title="Love"
+        app:showAsAction="ifRoom|collapseActionView" />
 </menu>

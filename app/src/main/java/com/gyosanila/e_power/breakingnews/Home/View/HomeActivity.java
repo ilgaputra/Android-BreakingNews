@@ -40,7 +40,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +126,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void run() {
                     Toast.makeText(getApplicationContext(),
-                            "city list refreshed", Toast.LENGTH_SHORT).show();
+                            "News list refreshed", Toast.LENGTH_SHORT).show();
                     swipeView.setRefreshing(false);
                 }
             }, 1000);
@@ -228,11 +227,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onItemClick(View v, int pos) {
                     //CREATE INTENT
-                    //Intent i=new Intent(getApplicationContext(),DetailActivity.class);
+                    Intent i=new Intent(getApplicationContext(),DetailActivity.class);
                     Log.e("Home",String.valueOf(pos));
-                    //i.putExtra(Config.TAG_id, String.valueOf(lists.get(pos).getId()));
-                    //i.putExtra(Config.TAG_menu, "tampilpesanan");
-                  // startActivity(i);
+                    i.putExtra("title", items.get(pos).getTitle());
+                    i.putExtra("description", items.get(pos).getDescription());
+                    i.putExtra("source", items.get(pos).getSource());
+                    i.putExtra("author", items.get(pos).getAuthor());
+                    i.putExtra("publish", items.get(pos).getPublish());
+                    i.putExtra("urlImage", items.get(pos).getUrlImage());
+                    i.putExtra("url", items.get(pos).getUrl());
+                   startActivity(i);
                     //finish();
                 }
 
@@ -257,7 +261,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 
