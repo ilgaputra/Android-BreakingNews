@@ -2,16 +2,16 @@ package com.gyosanila.e_power.breakingnews.Home.Model;
 
 import com.gyosanila.e_power.breakingnews.Home.View.HomeActivity;
 
-public class HomeClass {
+public class News {
 
     String title,description,source,author,publish,urlImage,url;
 
-    public HomeClass (HomeActivity context, String title, String description, String source, String author, String publish, String urlImage, String url)
+    public News(String title, String description, String author, String source,  String publish, String urlImage, String url)
     {
         this.title = title;
         this.description = description;
-        this.source = source;
         this.author = author;
+        this.source = source;
         this.publish = publish;
         this.urlImage = urlImage;
         this.url = url;

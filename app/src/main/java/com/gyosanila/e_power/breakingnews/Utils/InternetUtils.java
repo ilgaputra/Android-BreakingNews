@@ -3,6 +3,9 @@ package com.gyosanila.e_power.breakingnews.Utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
+
+import com.gyosanila.e_power.breakingnews.Home.View.HomeActivity;
 
 public class InternetUtils {
     /**
@@ -21,6 +24,7 @@ public class InternetUtils {
                     if (info[i].getState() == NetworkInfo.State.CONNECTED)
                         return true;
         }
+        Toast.makeText(context,"Not Internet Access",Toast.LENGTH_SHORT).show();
         return false;
     }
 }

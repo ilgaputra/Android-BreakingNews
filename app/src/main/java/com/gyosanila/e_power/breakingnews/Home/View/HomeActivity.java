@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,10 +27,11 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.gyosanila.e_power.breakingnews.Database.Database;
 import com.gyosanila.e_power.breakingnews.DetailNews.DetailActivity;
 import com.gyosanila.e_power.breakingnews.Home.Model.ItemClickListener;
 import com.gyosanila.e_power.breakingnews.Home.Model.MyHolder;
-import com.gyosanila.e_power.breakingnews.Home.Model.HomeClass;
+import com.gyosanila.e_power.breakingnews.Home.Model.News;
 import com.gyosanila.e_power.breakingnews.R;
 import com.gyosanila.e_power.breakingnews.Utils.InternetUtils;
 import com.gyosanila.e_power.breakingnews.app.AppConfig;
@@ -53,8 +55,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView rvHome;
     private Toolbar toolbar;
 
-    List<HomeClass> interestConnect = new ArrayList<>();
+    List<News> mNews = new ArrayList<>();
     HomeActivity.NewsAdapter adapterHome;
+    Database db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         initDrawerLayout();
         initNavigation();
         getDataServer();
+
     }
 
     private void initToolbar()
@@ -136,10 +140,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     };
 
     private void getDataServer(){
+        db = new Database(getApplicationContext());
         if(InternetUtils.isConnectedToInternet(getApplicationContext())){
-            //db = new Database(getApplicationContext());
-            //db.clearEvent(0,Database.ALLEVENT);
+            db.clearEvent(0);
             getAllNews(AppConfig.Server);
+        }
+        else
+        {
+
+            showData(db.getNews(0));
         }
     }
 
@@ -151,7 +160,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         try {
                             Log.e("Home", jsonObject.toString());
                             if (jsonObject.getString("status").equals("ok")) {
-                                interestConnect.clear();
+                                mNews.clear();
                                 JSONArray jArray = new JSONArray(jsonObject.getString("articles"));
                                 int arrayLength = jArray.length();
                                 for(int i=0;i<arrayLength;i++) {
@@ -176,10 +185,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                     urlImage = objArticles.getString("urlToImage");
                                     url = objArticles.getString("url");
 
-                                    interestConnect.add(new HomeClass(HomeActivity.this,title,description,source,author,publish,urlImage,url));
+                                    mNews.add(new News(title,description,author,source,publish,urlImage,url));
                                 }
-                                adapterHome = new HomeActivity.NewsAdapter(HomeActivity.this,interestConnect);
-                                rvHome.setAdapter(adapterHome);
+                                db.insertNews(mNews,0);
+                                showData(db.getNews(0));
                             }
                         } catch (JSONException e) {
                             Log.e("SaveLocal:",e.toString());
@@ -196,12 +205,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     class NewsAdapter extends RecyclerView.Adapter<MyHolder> {
-        List<HomeClass> items;
+        List<News> items;
         HomeActivity context;
         int pos;
         View v;
 
-        public NewsAdapter(HomeActivity context, List<HomeClass> items){
+        public NewsAdapter(HomeActivity context, List<News> items){
             this.context = context;
             this.items = items;
         }
@@ -209,8 +218,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         //membuat layout item jadi anak  layoutnya
         public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             v= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_home,null);
-            MyHolder interestViewHolder = new MyHolder(v);
-            return interestViewHolder;
+            MyHolder newsViewHolder = new MyHolder(v);
+            return newsViewHolder;
         }
 
         @Override
@@ -248,6 +257,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public void showData(List<News> mNews)
+    {
+        adapterHome = new HomeActivity.NewsAdapter(HomeActivity.this,mNews);
+        rvHome.setAdapter(adapterHome);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -262,6 +277,34 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setQueryHint("Searching...");
+        searchView.onActionViewExpanded();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                try {
+                    Log.e("Search", newText);
+                    String query = newText;
+                    if(query.equals("")){
+                        showData(db.getNews(0));
+                    }else{
+                        showData(db.searchingNews(query, 0));
+                    }
+
+                } catch (Exception e) {
+
+                }
+                return true;
+            }
+        });
+
         return true;
     }
 
