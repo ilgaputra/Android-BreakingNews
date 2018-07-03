@@ -35,7 +35,7 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NEWS + " " +
-                        "(" + TITLE + " TEXT, " +
+                        "(" + TITLE + " TEXT , " +
                         DESCRIPTION + " TEXT, " +
                         AUTHOR + " TEXT, " +
                         SOURCE + " TEXT, " +
@@ -44,7 +44,7 @@ public class Database extends SQLiteOpenHelper {
                         URL + " TEXT)");
 
         db.execSQL("CREATE TABLE " + TABLE_NEWS_INTEREST + " " +
-                "(" + TITLE + " TEXT, " +
+                "(" + TITLE + " TEXT PRIMARY KEY, " +
                 DESCRIPTION + " TEXT, " +
                 AUTHOR + " TEXT, " +
                 SOURCE + " TEXT, " +
@@ -58,10 +58,10 @@ public class Database extends SQLiteOpenHelper {
 
     }
 
-    public void insertNews(List<News> mEvent,int interests_news){
+    public void insertNews(List<News> mNews,int interests_news){
         SQLiteDatabase db = getWritableDatabase();
-
-        for(News event : mEvent){
+        String title;
+        for(News event : mNews){
             ContentValues values = new ContentValues();
             values.put(TITLE,event.getTitle());
             values.put(DESCRIPTION ,event.getDescription());
@@ -70,6 +70,7 @@ public class Database extends SQLiteOpenHelper {
             values.put(PUBLISH,event.getPublish());
             values.put(URLIMAGE ,event.getUrlImage());
             values.put(URL ,event.getUrl());
+            title = event.getTitle();
 
             try{
                 if(interests_news == 0)
@@ -77,7 +78,10 @@ public class Database extends SQLiteOpenHelper {
                     db.insert(TABLE_NEWS, null, values);
                 } else if (interests_news == 1)
                 {
-                    db.insert(TABLE_NEWS_INTEREST, null, values);
+                    if(checkTitleInterest(title))
+                    {
+                        db.insert(TABLE_NEWS_INTEREST, null, values);
+                    }
                 }
             Log.e("Database","Insert Sukses");
 
@@ -86,6 +90,17 @@ public class Database extends SQLiteOpenHelper {
         }
 
         db.close();
+    }
+
+    public boolean checkTitleInterest(String query)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NEWS_INTEREST + " WHERE " +
+                TITLE + " LIKE '%" + query + "%'", null);
+        if (cursor.getCount() > 0) {
+            return false;
+        }
+        return true;
     }
 
     public List<News> getNews(int interests_news){
@@ -97,16 +112,28 @@ public class Database extends SQLiteOpenHelper {
             TableName = TABLE_NEWS_INTEREST;
         }
         cursor = db.rawQuery(String.format("SELECT * FROM %s", TableName), null);
-
-        if(cursor.moveToFirst()){
-            do{
-                mNews.add(new News(
-                        cursor.getString(0),cursor.getString(1),
-                        cursor.getString(2), cursor.getString(3),
-                        cursor.getString(4),cursor.getString(5),
-                        cursor.getString(6)
-                ));
-            }while(cursor.moveToNext());
+        if(interests_news == 0) {
+            if(cursor.moveToFirst()){
+                do{
+                    mNews.add(new News(
+                            cursor.getString(0),cursor.getString(1),
+                            cursor.getString(2), cursor.getString(3),
+                            cursor.getString(4),cursor.getString(5),
+                            cursor.getString(6)
+                    ));
+                }while(cursor.moveToNext());
+            }
+        } else {
+            if (cursor.moveToLast()) {
+                do {
+                    mNews.add(new News(
+                            cursor.getString(0), cursor.getString(1),
+                            cursor.getString(2), cursor.getString(3),
+                            cursor.getString(4), cursor.getString(5),
+                            cursor.getString(6)
+                    ));
+                } while (cursor.moveToPrevious());
+            }
         }
         cursor.close();
         db.close();
@@ -128,6 +155,28 @@ public class Database extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + TableName + " WHERE " +
                 TITLE + " LIKE '%" + query + "%' or " +
                 AUTHOR + " LIKE '%"+ query+"%'",null);
+        if(cursor.moveToFirst()){
+            do{
+                mNews.add(new News(
+                        cursor.getString(0),cursor.getString(1),
+                        cursor.getString(2), cursor.getString(3),
+                        cursor.getString(4),cursor.getString(5),
+                        cursor.getString(6)
+                ));
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return mNews;
+    }
+
+    public List<News> getNewsDetail(String query){
+        List<News> mNews = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String TableName = TABLE_NEWS;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TableName + " WHERE " +
+                TITLE + " LIKE '" + query + "'",null);
         if(cursor.moveToFirst()){
             do{
                 mNews.add(new News(

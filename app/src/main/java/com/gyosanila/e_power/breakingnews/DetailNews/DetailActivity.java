@@ -15,16 +15,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.gyosanila.e_power.breakingnews.Database.Database;
+import com.gyosanila.e_power.breakingnews.Home.Model.News;
 import com.gyosanila.e_power.breakingnews.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
 
     public TextView title,description,source,author,publish,link;
     Toolbar toolbar;
-    String Url;
+    String Title,Description,Source,Author,Publish,Link,Url,UrlImage;
+    Database db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,20 +75,23 @@ public class DetailActivity extends AppCompatActivity {
 
     public void setView()
     {
-        title.setText(getIntent().getStringExtra("title"));
-        String Description = getIntent().getStringExtra("description");
-        if(Description.equals("null"))
-        {
-            Description = "Don't have Description";
-        }
-        description.setText(Description);
-        source.setText(getIntent().getStringExtra("source"));
-        author.setText(getIntent().getStringExtra("author"));
-        publish.setText(getIntent().getStringExtra("publish"));
+        Title = getIntent().getStringExtra("title");
+        Description = getIntent().getStringExtra("description");
+        Source = getIntent().getStringExtra("source");
+        Author = getIntent().getStringExtra("author");
+        Publish = getIntent().getStringExtra("publish");
         Url = getIntent().getStringExtra("url");
+        UrlImage = getIntent().getStringExtra("urlImage");
+
+        title.setText(Title);
+        description.setText(Description);
+        source.setText(Source);
+        author.setText(Author);
+        publish.setText(Publish);
+
 
         final AppBarLayout layout = (AppBarLayout) findViewById(R.id.app_bar);
-        Picasso.get().load(getIntent().getStringExtra("urlImage")).into(new Target(){
+        Picasso.get().load(UrlImage).into(new Target(){
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
@@ -107,7 +117,11 @@ public class DetailActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                db = new Database(getApplicationContext());
+                List<News> mNews = new ArrayList<>();
+                mNews.add(new News(Title,Description,Author,Source,Publish,UrlImage,Url));
+                db.insertNews(mNews,1);
+                Toast.makeText(getApplicationContext(),"News Save",Toast.LENGTH_SHORT).show();
             }
         });
     }

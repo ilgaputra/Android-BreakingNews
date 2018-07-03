@@ -170,6 +170,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                                     title = objArticles.getString("title");
                                     description = objArticles.getString("description");
+                                    if(description.equals("null"))
+                                    {
+                                        description = "Don't have Description";
+                                    }
                                     source = objSource.getString("name");
                                     author = objArticles.getString("author");
                                     if(author.equals("null"))
@@ -246,7 +250,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     i.putExtra("urlImage", items.get(pos).getUrlImage());
                     i.putExtra("url", items.get(pos).getUrl());
                    startActivity(i);
-                    //finish();
                 }
 
             });
