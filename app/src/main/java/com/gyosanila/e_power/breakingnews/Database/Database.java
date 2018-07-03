@@ -146,11 +146,16 @@ public class Database extends SQLiteOpenHelper {
     0 = false / allEvent
     1= true /Interests Event
      */
-    public List<News> searchingNews(String query, int interestEvents){
+    public List<News> searchingNews(String query, int interestNews){
         List<News> mNews = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
 
         String TableName = TABLE_NEWS;
+
+        if (interestNews == 1)
+        {
+            TableName = TABLE_NEWS_INTEREST;
+        }
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + TableName + " WHERE " +
                 TITLE + " LIKE '%" + query + "%' or " +

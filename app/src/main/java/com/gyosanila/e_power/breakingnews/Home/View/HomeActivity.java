@@ -54,6 +54,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout swipeView;
     private RecyclerView rvHome;
     private Toolbar toolbar;
+    NavigationView navigationView;
+    private int Menu = 0;
 
     List<News> mNews = new ArrayList<>();
     HomeActivity.NewsAdapter adapterHome;
@@ -106,7 +108,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     public void initNavigation()
     {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -148,7 +150,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         else
         {
 
-            showData(db.getNews(0));
+            showData(db.getNews(Menu));
         }
     }
 
@@ -192,7 +194,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                     mNews.add(new News(title,description,author,source,publish,urlImage,url));
                                 }
                                 db.insertNews(mNews,0);
-                                showData(db.getNews(0));
+                                showData(db.getNews(Menu));
                             }
                         } catch (JSONException e) {
                             Log.e("SaveLocal:",e.toString());
@@ -271,13 +273,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if(toolbar.getTitle().equals("Save News")){
+            toolbar.setTitle("Breaking News");
+            Menu = 0;
+            showData(db.getNews(Menu));
+            navigationView.getMenu().getItem(1).setChecked(false);
+
+
         } else {
             super.onBackPressed();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
 
@@ -296,9 +305,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     Log.e("Search", newText);
                     String query = newText;
                     if(query.equals("")){
-                        showData(db.getNews(0));
+                        showData(db.getNews(Menu));
                     }else{
-                        showData(db.searchingNews(query, 0));
+                        showData(db.searchingNews(query, Menu));
                     }
 
                 } catch (Exception e) {
@@ -338,7 +347,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.save_news) {
+            toolbar.setTitle("Save News");
+            Menu=1;
+            showData(db.getNews(Menu));
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -349,7 +361,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
